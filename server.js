@@ -1,28 +1,21 @@
 const WebSocket = require('ws');
+const port = process.env.PORT || 8765;
 
-const server = new WebSocket.Server({ port: 8765 });
+const server = new WebSocket.Server({ port });
 
 server.on('connection', (socket) => {
     console.log('Client connected');
 
     socket.on('message', (message) => {
-        //console.log('Received raw message:', message);
-
         try {
-            // Пытаемся распарсить входящее сообщение как JSON
             const data = JSON.parse(message);
-            //console.log('Received data:', data);
-
-            // Выполняем нужные операции с данными
-
-            // Отправляем данные всем клиентам
             server.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(JSON.stringify(data));
                 }
             });
         } catch (error) {
-            //console.error('Error parsing message:', error);
+            console.error('Error parsing message:', error);
         }
     });
 
@@ -31,4 +24,4 @@ server.on('connection', (socket) => {
     });
 });
 
-//console.log('WebSocket server is running on ws://localhost:8765');
+console.log(`WebSocket server is running on port ${port}`);
